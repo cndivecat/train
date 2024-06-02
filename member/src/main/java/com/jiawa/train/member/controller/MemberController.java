@@ -12,7 +12,7 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
     @GetMapping("/count")
-    public int count(){
-        return memberService.count();
+    public long countByExample(){
+        return memberService.countByExample();
     }
 }
