@@ -1,5 +1,6 @@
 package com.jiawa.train.member.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.jiawa.train.common.aspect.LogAspect;
 import com.jiawa.train.common.exception.BusinessException;
@@ -8,8 +9,10 @@ import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.member.domain.Member;
 import com.jiawa.train.member.domain.MemberExample;
 import com.jiawa.train.member.mapper.MemberMapper;
+import com.jiawa.train.member.req.MemberLoginReq;
 import com.jiawa.train.member.req.MemberRegisterReq;
 import com.jiawa.train.member.req.MemberSendCodeReq;
+import com.jiawa.train.member.resp.MemberLoginResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +31,11 @@ public class MemberService {
 
     public long register(MemberRegisterReq req){
         String mobile = req.getMobile();
-        MemberExample memberExample = new MemberExample();
-        memberExample.createCriteria().andMobileEqualTo(mobile);
-        List<Member> list = memberMapper.selectByExample(memberExample);
-        if (CollUtil.isNotEmpty(list)){
+        Member member = selectMemberByMobile(mobile);
+        if (member!=null){
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_EXIST);
         }
-        Member member = new Member();
+        member = new Member();
         member.setId(SnowUtil.getSnowflakeNextId());
         member.setMobile(mobile);
         memberMapper.insert(member);
@@ -43,12 +44,10 @@ public class MemberService {
 
     public void sendCode(MemberSendCodeReq req){
         String mobile = req.getMobile();
-        MemberExample memberExample = new MemberExample();
-        memberExample.createCriteria().andMobileEqualTo(mobile);
-        List<Member> list = memberMapper.selectByExample(memberExample);
-        if (CollUtil.isEmpty(list)){
+        Member member = selectMemberByMobile(mobile);
+        if (member==null){
             LOG.info("该手机号码未注册，已帮助自动注册");
-            Member member = new Member();
+            member = new Member();
             member.setId(SnowUtil.getSnowflakeNextId());
             member.setMobile(mobile);
             memberMapper.insert(member);
@@ -63,5 +62,28 @@ public class MemberService {
         LOG.info("保存短信记录表");
         //对接短信通道，发送短信
         LOG.info("对接短信通道");
+    }
+    public MemberLoginResp login(MemberLoginReq req){
+        String mobile = req.getMobile();
+        String code = req.getCode();
+        Member member = selectMemberByMobile(mobile);
+        if (member==null){
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_NOT_EXIST);
+        }
+        if (!"8888".equals(code)){
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR);
+        }
+        return BeanUtil.copyProperties(member,MemberLoginResp.class);
+
+    }
+
+    private Member selectMemberByMobile(String mobile) {
+        MemberExample memberExample = new MemberExample();
+        memberExample.createCriteria().andMobileEqualTo(mobile);
+        List<Member> list = memberMapper.selectByExample(memberExample);
+        if (CollUtil.isEmpty(list)){
+            return null;
+        }
+        return list.get(0);
     }
 }
