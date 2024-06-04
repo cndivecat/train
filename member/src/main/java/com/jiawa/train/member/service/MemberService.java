@@ -2,10 +2,10 @@ package com.jiawa.train.member.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.jwt.JWTUtil;
 import com.jiawa.train.common.aspect.LogAspect;
 import com.jiawa.train.common.exception.BusinessException;
 import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.util.JwtUtil;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.member.domain.Member;
 import com.jiawa.train.member.domain.MemberExample;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MemberService {
@@ -76,9 +75,7 @@ public class MemberService {
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR);
         }
         MemberLoginResp memberLoginResp = BeanUtil.copyProperties(member, MemberLoginResp.class);
-        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(memberLoginResp);
-        String key = "Jiawa12306";
-        memberLoginResp.setToken(JWTUtil.createToken(stringObjectMap,key.getBytes()));
+        memberLoginResp.setToken(JwtUtil.createToken(memberLoginResp.getId(),memberLoginResp.getMobile()));
         return memberLoginResp;
 
     }
