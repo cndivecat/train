@@ -38,6 +38,7 @@ public class StationService {
             stationMapper.insert(station);
         } else {
             station.setUpdateTime(now);
+            station.setCreateTime(stationMapper.selectByPrimaryKey(station.getId()).getCreateTime());
             stationMapper.updateByPrimaryKey(station);
         }
     }

@@ -38,6 +38,7 @@ public class TrainService {
             trainMapper.insert(train);
         } else {
             train.setUpdateTime(now);
+            train.setCreateTime(trainMapper.selectByPrimaryKey(train.getId()).getCreateTime());
             trainMapper.updateByPrimaryKey(train);
         }
     }
