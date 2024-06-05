@@ -38,7 +38,7 @@ public class PassengerService {
         if (ObjUtil.isNotNull(req.getMemberId())){
             criteria.andMemberIdEqualTo(req.getMemberId());
         }
-        PageHelper.startPage(2,2);
+        PageHelper.startPage(req.getPage(),req.getSize());
         List<Passenger> passengers = passengerMapper.selectByExample(passengerExample);
         return BeanUtil.copyToList(passengers, PassengerQueryResp.class);
     }
