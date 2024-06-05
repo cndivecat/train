@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 public class MemberService {
-    private final static Logger LOG = LoggerFactory.getLogger(LogAspect.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MemberService.class);
     @Autowired
     private MemberMapper memberMapper;
     public long countByExample(){
