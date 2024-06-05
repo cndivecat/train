@@ -16,18 +16,20 @@ import java.util.*;
 public class ServerGenerator {
 //    static boolean readOnly = true;
 //    static String vuePath = "admin/src/views/main/";
+
     static String serverPath = "[module]/src/main/java/com/jiawa/train/[module]/";
     static String pomPath = "generator/pom.xml";
     static String module = "";
-    static {
-        new File(serverPath).mkdirs();
-    }
+//    static {
+//        new File(serverPath).mkdirs();
+//    }
 
     public static void main(String[] args) throws Exception {
         // 获取mybatis-generator
         String generatorPath = getGeneratorPath();
         // 比如generator-config-member.xml，得到module = member
         module = generatorPath.replace("src/main/resources/generator-config-", "").replace(".xml", "");
+
         System.out.println("module: " + module);
         serverPath = serverPath.replace("[module]", module);
         // new File(servicePath).mkdirs();
