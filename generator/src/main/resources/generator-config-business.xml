@@ -43,6 +43,6 @@
 
         <!--<table tableName="business" domainObjectName="Business"/>-->
 <!--        <table tableName="business" domainObjectName="Business"/>-->
-        <table tableName="daily_train_station" domainObjectName="DailyTrainStation"/>
+        <table tableName="daily_train_carriage" domainObjectName="DailyTrainCarriage"/>
     </context>
 </generatorConfiguration>
