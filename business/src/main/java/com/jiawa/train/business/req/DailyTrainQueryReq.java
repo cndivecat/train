@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 public class DailyTrainQueryReq extends PageReq {
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")//get请求的日期是拼接在url中的，需要使用spring自带的@DateTimeFormat
     private Date date;
     private String code;
 
