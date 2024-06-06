@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiawa.train.business.domain.TrainCarriage;
 import com.jiawa.train.business.domain.TrainCarriageExample;
+import com.jiawa.train.business.enums.SeatColEnum;
 import com.jiawa.train.business.mapper.TrainCarriageMapper;
 import com.jiawa.train.business.req.TrainCarriageQueryReq;
 import com.jiawa.train.business.req.TrainCarriageSaveReq;
@@ -30,6 +31,9 @@ public class TrainCarriageService {
 
     public void save(TrainCarriageSaveReq req) {
         DateTime now = DateTime.now();
+        List<SeatColEnum> seatColEnums = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(seatColEnums.size());
+        req.setSeatCount(req.getColCount()*req.getRowCount());
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if (ObjectUtil.isNull(trainCarriage.getId())) {
             trainCarriage.setId(SnowUtil.getSnowflakeNextId());
