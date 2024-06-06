@@ -1,18 +1,21 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.Train;
 import com.jiawa.train.business.domain.TrainExample;
 import com.jiawa.train.business.mapper.TrainMapper;
 import com.jiawa.train.business.req.TrainQueryReq;
 import com.jiawa.train.business.req.TrainSaveReq;
 import com.jiawa.train.business.resp.TrainQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,10 @@ public class TrainService {
         DateTime now = DateTime.now();
         Train train = BeanUtil.copyProperties(req, Train.class);
         if (ObjectUtil.isNull(train.getId())) {
+            Train trainDB = getTrains(req.getCode());
+            if (ObjectUtil.isNotNull(trainDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_CODE_UNIQUE_ERROR);
+            }
             train.setId(SnowUtil.getSnowflakeNextId());
             train.setCreateTime(now);
             train.setUpdateTime(now);
@@ -42,7 +49,15 @@ public class TrainService {
             trainMapper.updateByPrimaryKey(train);
         }
     }
-
+    private Train getTrains(String code) {
+        TrainExample trainExample = new TrainExample();
+        trainExample.createCriteria().andCodeEqualTo(code);
+        List<Train> trains = trainMapper.selectByExample(trainExample);
+        if (CollUtil.isNotEmpty(trains)){
+            return trains.get(0);
+        }
+        return null;
+    }
     public PageResp<TrainQueryResp> queryList(TrainQueryReq req) {
         TrainExample trainExample = new TrainExample();
         trainExample.setOrderByClause("id desc");

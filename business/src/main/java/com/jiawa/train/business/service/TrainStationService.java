@@ -1,18 +1,21 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.TrainStation;
 import com.jiawa.train.business.domain.TrainStationExample;
 import com.jiawa.train.business.mapper.TrainStationMapper;
 import com.jiawa.train.business.req.TrainStationQueryReq;
 import com.jiawa.train.business.req.TrainStationSaveReq;
 import com.jiawa.train.business.resp.TrainStationQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,14 @@ public class TrainStationService {
         DateTime now = DateTime.now();
         TrainStation trainStation = BeanUtil.copyProperties(req, TrainStation.class);
         if (ObjectUtil.isNull(trainStation.getId())) {
+            TrainStation trainStationDB = getTrainStations(req.getTrainCode(),req.getIndex());
+            if (ObjectUtil.isNotNull(trainStationDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_STATION_INDEX_UNIQUE_ERROR);
+            }
+            trainStationDB = getTrainStations(req.getTrainCode(),req.getName());
+            if (ObjectUtil.isNotNull(trainStationDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_STATION_NAME_UNIQUE_ERROR);
+            }
             trainStation.setId(SnowUtil.getSnowflakeNextId());
             trainStation.setCreateTime(now);
             trainStation.setUpdateTime(now);
@@ -42,7 +53,24 @@ public class TrainStationService {
             trainStationMapper.updateByPrimaryKey(trainStation);
         }
     }
-
+    private TrainStation getTrainStations(String trainCode, Integer index) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andIndexEqualTo(index);
+        List<TrainStation> trainStations = trainStationMapper.selectByExample(trainStationExample);
+        if (CollUtil.isNotEmpty(trainStations)){
+            return trainStations.get(0);
+        }
+        return null;
+    }
+    private TrainStation getTrainStations(String trainCode, String name) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andNameEqualTo(name);
+        List<TrainStation> trainStations = trainStationMapper.selectByExample(trainStationExample);
+        if (CollUtil.isNotEmpty(trainStations)){
+            return trainStations.get(0);
+        }
+        return null;
+    }
     public PageResp<TrainStationQueryResp> queryList(TrainStationQueryReq req) {
         TrainStationExample trainStationExample = new TrainStationExample();
         trainStationExample.setOrderByClause("train_code asc, `index` asc");
