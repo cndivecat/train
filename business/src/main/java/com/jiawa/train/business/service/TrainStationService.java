@@ -16,9 +16,9 @@ import com.jiawa.train.common.exception.BusinessException;
 import com.jiawa.train.common.exception.BusinessExceptionEnum;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
-import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class TrainStationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TrainStationService.class);
 
-    @Resource
+    @Autowired
     private TrainStationMapper trainStationMapper;
 
     public void save(TrainStationSaveReq req) {
