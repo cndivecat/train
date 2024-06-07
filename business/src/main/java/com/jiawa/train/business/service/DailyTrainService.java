@@ -118,7 +118,7 @@ public class DailyTrainService {
         dailyTrainStationService.genDaily(date,train.getCode());
         dailyTrainCarriageService.genDaily(date,train.getCode());
         dailyTrainSeatService.genDaily(date,train.getCode());
-        dailyTrainTicketService.genDaily(date,train.getCode());
+        dailyTrainTicketService.genDaily(dailyTrain,date,train.getCode());
         LOG.info("结束生成日期【{}】车次【{}】的信息", DateUtil.formatDate(date),train.getCode());
     }
 }
