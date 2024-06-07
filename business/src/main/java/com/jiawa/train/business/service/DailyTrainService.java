@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -42,6 +43,9 @@ public class DailyTrainService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+
+    @Resource
+    private DailyTrainTicketService dailyTrainTicketService;
 
     public void save(DailyTrainSaveReq req) {
         DateTime now = DateTime.now();
@@ -98,8 +102,8 @@ public class DailyTrainService {
             genDailyTrain(date, train);
         }
     }
-
-    private void genDailyTrain(Date date, Train train) {
+    @Transactional
+    public void genDailyTrain(Date date, Train train) {
         LOG.info("开始生成日期【{}】车次【{}】的信息", DateUtil.formatDate(date),train.getCode());
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
         dailyTrainExample.createCriteria().andDateEqualTo(date).andCodeEqualTo(train.getCode());
@@ -114,6 +118,7 @@ public class DailyTrainService {
         dailyTrainStationService.genDaily(date,train.getCode());
         dailyTrainCarriageService.genDaily(date,train.getCode());
         dailyTrainSeatService.genDaily(date,train.getCode());
+        dailyTrainTicketService.genDaily(date,train.getCode());
         LOG.info("结束生成日期【{}】车次【{}】的信息", DateUtil.formatDate(date),train.getCode());
     }
 }
