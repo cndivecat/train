@@ -89,7 +89,7 @@ public class TrainSeatService {
             String seatType = trainCarriage.getSeatType();
             int seatIndex = 1;
             List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(seatType);
-            for (int row = 0; row <= rowCount; row++) {
+            for (int row = 1; row <= rowCount; row++) {
                 for (SeatColEnum seatColEnum : colEnumList) {
                     TrainSeat trainSeat = new TrainSeat();
                     trainSeat.setId(SnowUtil.getSnowflakeNextId());
@@ -106,5 +106,13 @@ public class TrainSeatService {
                 }
             }
         }
+    }
+
+    public List<TrainSeat> selectByTrainCode(String trainCode) {
+        TrainSeatExample trainSeatExample = new TrainSeatExample();
+        trainSeatExample.setOrderByClause("id asc");
+        TrainSeatExample.Criteria criteria = trainSeatExample.createCriteria();
+        criteria.andTrainCodeEqualTo(trainCode);
+        return trainSeatMapper.selectByExample(trainSeatExample);
     }
 }
